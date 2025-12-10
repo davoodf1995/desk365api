@@ -20,7 +20,7 @@
     "require": {
         "php": "^8.0",
         "spatie/laravel-package-tools": "^1.14.0",
-        "illuminate/contracts": "^10.0",
+        "illuminate/contracts": "^10.0|^11.0|^12.0",
         "illuminate/support": "^10.0|^11.0|^12.0"
     },
     "require-dev": {
@@ -56,7 +56,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
         }
     },
     "extra": {
@@ -72,6 +73,3 @@
     "minimum-stability": "dev",
     "prefer-stable": true
 }
-
-
-
