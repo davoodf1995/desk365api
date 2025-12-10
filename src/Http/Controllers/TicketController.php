@@ -254,7 +254,7 @@ class TicketController
         }
 
         return ApiResponseDto::error(
-            message: $data['message'] ?? $data,
+            message: is_string($data['message'] ?? null) ? $data['message'] : (is_array($data) ? json_encode($data) : 'API request failed'),
             errors: $data['errors'] ?? null,
             statusCode: $statusCode,
             meta: $data['meta'] ?? null
