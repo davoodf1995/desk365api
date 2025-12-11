@@ -45,6 +45,7 @@ class ApiConfigDto
     {
         $headers = $this->headers ?? [];
         $headers['Authorization'] = $this->apiKey;
+        $headers['Accept'] = 'application/json';
         
         if ($this->apiSecret) {
             $headers['X-API-Secret'] = $this->apiSecret;

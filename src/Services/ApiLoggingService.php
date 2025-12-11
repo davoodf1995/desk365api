@@ -57,19 +57,21 @@ class ApiLoggingService
      */
     public function sanitizeHeaders(array $headers): array
     {
+        if (empty($headers)) {
+            return [];
+        }
+        
         $sanitized = $headers;
         
-        // Remove or mask sensitive headers
+        // Remove or mask sensitive headers (case-insensitive check)
         $sensitiveKeys = ['api-key', 'api_secret', 'authorization', 'x-api-key', 'x-api-secret'];
         
-        foreach ($sensitiveKeys as $key) {
-            if (isset($sanitized[$key])) {
-                $sanitized[$key] = '***REDACTED***';
-            }
-            // Also check case-insensitive
-            foreach ($sanitized as $headerKey => $value) {
-                if (strtolower($headerKey) === strtolower($key)) {
+        foreach ($sanitized as $headerKey => $value) {
+            $headerKeyLower = strtolower($headerKey);
+            foreach ($sensitiveKeys as $sensitiveKey) {
+                if ($headerKeyLower === strtolower($sensitiveKey)) {
                     $sanitized[$headerKey] = '***REDACTED***';
+                    break;
                 }
             }
         }

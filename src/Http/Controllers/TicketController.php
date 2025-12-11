@@ -51,12 +51,12 @@ class TicketController
     public function getById(string $ticketNumber): ApiResponseDto
     {
         try {
-            $endpoint = $this->getEndpoint("tickets/details", ['ticket_number' => $ticketNumber]);
+            $endpoint = $this->getEndpoint("tickets/details");
             $response = $this->makeLoggedApiCall(
                 method: 'GET',
                 endpoint: $endpoint,
                 headers: $this->config->getAuthHeaders(),
-                data: [],
+                data: ['ticket_number' => $ticketNumber],
                 timeout: $this->config->timeout,
                 operation: 'getTicket'
             );
@@ -253,8 +253,14 @@ class TicketController
             );
         }
 
+        // Try to extract error message from various possible fields
+        $errorMessage = $data['message'] ?? $data['error'] ?? null;
+        if (!is_string($errorMessage)) {
+            $errorMessage = is_array($data) ? json_encode($data) : 'API request failed';
+        }
+
         return ApiResponseDto::error(
-            message: is_string($data['message'] ?? null) ? $data['message'] : (is_array($data) ? json_encode($data) : 'API request failed'),
+            message: $errorMessage,
             errors: $data['errors'] ?? null,
             statusCode: $statusCode,
             meta: $data['meta'] ?? null
