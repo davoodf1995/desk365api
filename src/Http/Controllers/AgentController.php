@@ -8,11 +8,12 @@ use Davoodf1995\Desk365\DTO\{
     AgentDto
 };
 use Davoodf1995\Desk365\Traits\LogsApiCalls;
+use Davoodf1995\Desk365\Traits\HandlesApiResponses;
 use Illuminate\Support\Facades\Log;
 
 class AgentController
 {
-    use LogsApiCalls;
+    use LogsApiCalls, HandlesApiResponses;
     private ApiConfigDto $config;
     private string $apiVersion;
 
@@ -122,37 +123,6 @@ class AgentController
         }
     }
 
-    private function getEndpoint(string $path, array $parameters = []): string
-    {
-        $endpoint = rtrim($this->config->baseUrl, '/') . '/apis/' . $this->apiVersion . '/' . ltrim($path, '/');
-        if (!empty($parameters)) {
-            $query = http_build_query($parameters);
-            $endpoint .= '?' . $query;
-        }
-        return $endpoint;
-    }
-
-    private function handleResponse($response): ApiResponseDto
-    {
-        $statusCode = $response->status();
-        $data = $response->json();
-
-        if ($response->successful()) {
-            return ApiResponseDto::success(
-                data: $data['data'] ?? $data,
-                message: $data['message'] ?? null,
-                statusCode: $statusCode,
-                meta: $data['meta'] ?? null
-            );
-        }
-
-        return ApiResponseDto::error(
-            message: $data['message'] ?? $data,
-            errors: $data['errors'] ?? null,
-            statusCode: $statusCode,
-            meta: $data['meta'] ?? null
-        );
-    }
 }
 
 
