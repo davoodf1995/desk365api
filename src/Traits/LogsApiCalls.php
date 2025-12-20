@@ -163,6 +163,9 @@ trait LogsApiCalls
                         // Handle UploadedFile objects by extracting path and filename
                         if (is_object($f) && method_exists($f, 'getRealPath') && method_exists($f, 'getClientOriginalName')) {
                             $httpClient = $httpClient->attach('files', $f->getRealPath(), $f->getClientOriginalName());
+                        } elseif (is_string($f) && file_exists($f)) {
+                            // Handle file paths - extract filename from path
+                            $httpClient = $httpClient->attach('files', $f, basename($f));
                         } else {
                             $httpClient = $httpClient->attach('files', $f);
                         }
@@ -173,6 +176,9 @@ trait LogsApiCalls
                     // Handle UploadedFile objects by extracting path and filename
                     if (is_object($fileToAttach) && method_exists($fileToAttach, 'getRealPath') && method_exists($fileToAttach, 'getClientOriginalName')) {
                         $httpClient = $httpClient->attach('file', $fileToAttach->getRealPath(), $fileToAttach->getClientOriginalName());
+                    } elseif (is_string($fileToAttach) && file_exists($fileToAttach)) {
+                        // Handle file paths - extract filename from path
+                        $httpClient = $httpClient->attach('file', $fileToAttach, basename($fileToAttach));
                     } else {
                         $httpClient = $httpClient->attach('file', $fileToAttach);
                     }
