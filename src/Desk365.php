@@ -10,7 +10,8 @@ use Davoodf1995\Desk365\Http\Controllers\{
     CustomerController,
     CommentController,
     AttachmentController,
-    ReportController
+    ReportController,
+    CompanyController
 };
 use Davoodf1995\Desk365\DTO\{
     TicketCreateDto,
@@ -19,7 +20,8 @@ use Davoodf1995\Desk365\DTO\{
     ReplyDto,
     NoteDto,
     AgentDto,
-    CustomerDto
+    CustomerDto,
+    CompanyDto
 };
 
 class Desk365
@@ -31,6 +33,7 @@ class Desk365
     private static ?CommentController $commentController = null;
     private static ?AttachmentController $attachmentController = null;
     private static ?ReportController $reportController = null;
+    private static ?CompanyController $companyController = null;
     private static ?Desk365TicketingService $service = null;
 
     /**
@@ -45,6 +48,7 @@ class Desk365
         self::$commentController = new CommentController($config);
         self::$attachmentController = new AttachmentController($config);
         self::$reportController = new ReportController($config);
+        self::$companyController = new CompanyController($config);
         self::$service = new Desk365TicketingService($config);
     }
 
@@ -254,6 +258,32 @@ class Desk365
     public static function updateCustomer(string $primaryEmail, CustomerDto $customerData)
     {
         return self::updateContact($primaryEmail, $customerData);
+    }
+
+    // ========== COMPANY OPERATIONS ==========
+
+    public static function getAllCompanies(array $params = [])
+    {
+        self::getConfig();
+        return self::$companyController->getAll($params);
+    }
+
+    public static function getCompanyByName(string $companyName)
+    {
+        self::getConfig();
+        return self::$companyController->getByName($companyName);
+    }
+
+    public static function createCompany(CompanyDto $companyData)
+    {
+        self::getConfig();
+        return self::$companyController->create($companyData);
+    }
+
+    public static function updateCompany(string $companyName, CompanyDto $companyData)
+    {
+        self::getConfig();
+        return self::$companyController->update($companyName, $companyData);
     }
 
     // ========== REPORT OPERATIONS ==========
