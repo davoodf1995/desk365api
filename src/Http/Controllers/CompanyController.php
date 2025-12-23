@@ -46,12 +46,12 @@ class CompanyController
     public function getByName(string $companyName): ApiResponseDto
     {
         try {
-            $endpoint = $this->getEndpoint('companies/details', ['name' => $companyName]);
+            $endpoint = $this->getEndpoint('companies/details');
             $response = $this->makeLoggedApiCall(
                 method: 'GET',
                 endpoint: $endpoint,
                 headers: $this->config->getAuthHeaders(),
-                data: [],
+                data: ['name' => $companyName],
                 timeout: $this->config->timeout,
                 operation: 'getCompanyByName'
             );
