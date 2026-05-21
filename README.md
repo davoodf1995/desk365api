@@ -194,33 +194,33 @@ $response = Desk365::deleteComment('TKT-001', 'comment_123');
 
 ### Attachment Operations
 
-#### Upload Attachment
+Desk365 does **not** expose `tickets/{ticket_number}/attachments`. Files must be sent with:
+
+- `tickets/create_with_attachment`
+- `tickets/add_reply_with_attachment`
+- `tickets/add_note_with_attachment`
+
+`uploadAttachment()` adds an extra file via **`add_note_with_attachment`** (private note by default). Use metadata to switch to a reply upload.
+
+#### Upload Attachment (overflow / single file)
 ```php
-$response = Desk365::uploadAttachment('TKT-001', $file, [
-    'filename' => 'document.pdf',
-    'description' => 'Support document'
+$response = Desk365::uploadAttachment('1046', '/path/to/file.pdf', [
+    'body' => '(attachment)',
+    'agent_email' => 'agent@contoso.com',
+    'private_note' => 1, // default: private note
+]);
+
+// Optional: attach via reply instead of note
+$response = Desk365::uploadAttachment('1046', '/path/to/file.pdf', [
+    'use_reply' => true,
+    'body' => '(attachment)',
+    'agent_email' => 'agent@contoso.com',
 ]);
 ```
 
-#### Get All Attachments
-```php
-$response = Desk365::getAttachments('TKT-001');
-```
+#### List / get / delete / download standalone attachments
 
-#### Get Single Attachment
-```php
-$response = Desk365::getAttachment('TKT-001', 'attachment_123');
-```
-
-#### Delete Attachment
-```php
-$response = Desk365::deleteAttachment('TKT-001', 'attachment_123');
-```
-
-#### Download Attachment
-```php
-$response = Desk365::downloadAttachment('TKT-001', 'attachment_123');
-```
+Not supported by Desk365. Attachment metadata (`attachment_url`, `file_name`, …) is returned on **ticket details** and **conversations** responses. `getAttachments`, `getAttachment`, `deleteAttachment`, and `downloadAttachment` return an error without calling the API.
 
 ### Agent Operations
 
