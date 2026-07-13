@@ -51,7 +51,7 @@ class CustomerController
                 method: 'GET',
                 endpoint: $endpoint,
                 headers: $this->config->getAuthHeaders(),
-                data: ['primary_email' => $primaryEmail],
+                data: ['primary_email' => trim($primaryEmail)],
                 timeout: $this->config->timeout,
                 operation: 'getContact'
             );
@@ -86,12 +86,13 @@ class CustomerController
     public function update(string $primaryEmail, CustomerDto $customerData): ApiResponseDto
     {
         try {
-            $endpoint = $this->getEndpoint("contacts/update", ['primary_email' => $primaryEmail]);
+            $normalizedEmail = trim($primaryEmail);
+            $endpoint = $this->getEndpoint("contacts/update", ['primary_email' => $normalizedEmail]);
             $response = $this->makeLoggedApiCall(
                 method: 'PUT',
                 endpoint: $endpoint,
                 headers: $this->config->getAuthHeaders(),
-                data: $customerData->toArray(),
+                data: $customerData->toUpdateArray(),
                 timeout: $this->config->timeout,
                 operation: 'updateContact'
             );

@@ -17,6 +17,7 @@ return [
     "retry_attempts" => env("DESK365_RETRY_ATTEMPTS", 3),
     "retry_backoff" => env("DESK365_RETRY_BACKOFF", 60), // seconds
     'version' => env('DESK365_API_VERSION', 'v3'),
+    'api_log_model' => env('DESK365_API_LOG_MODEL', \Davoodf1995\Desk365\Models\Desk365ApiLog::class),
     "from_email" => env("DESK365_FROM_EMAIL", "support@domain.desk365.io"),
 ];
 

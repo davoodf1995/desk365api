@@ -6,6 +6,7 @@ use Davoodf1995\Desk365\DTO\TicketCreateDto;
 use Davoodf1995\Desk365\DTO\TicketUpdateDto;
 use Davoodf1995\Desk365\DTO\ReplyDto;
 use Davoodf1995\Desk365\DTO\NoteDto;
+use Davoodf1995\Desk365\DTO\ConversationImportDto;
 use Davoodf1995\Desk365\DTO\ApiResponseDto;
 
 interface TicketingServiceInterface
@@ -21,6 +22,9 @@ interface TicketingServiceInterface
 
     // Ticket Notes
     public function addNote(string $ticketNumber, NoteDto $note, $files = null): ApiResponseDto;
+
+    // Conversation import (migration — no automation / notifications)
+    public function importConversations(string $ticketNumber, ConversationImportDto $data): ApiResponseDto;
 
     // Ticket Status and Priority
     public function updateTicketStatus(string $ticketNumber, string $status): ApiResponseDto;

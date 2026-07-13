@@ -5,7 +5,8 @@ use Davoodf1995\Desk365\DTO\{
     ApiResponseDto,
     TicketCreateDto,
     TicketUpdateDto,
-    CommentDto
+    CommentDto,
+    CustomerDto,
 };
 
 it('can create ApiConfigDto from array', function () {
@@ -112,6 +113,23 @@ it('can convert CommentDto to array', function () {
     expect($array)->toHaveKey('content')
         ->and($array)->toHaveKey('author_id')
         ->and($array['content'])->toBe('Test comment');
+});
+
+it('excludes primary_email from CustomerDto update payload', function () {
+    $dto = new CustomerDto(
+        name: 'Jane',
+        primary_email: 'jane@example.com',
+        title: 'Manager',
+        company_name: 'Contoso',
+    );
+
+    $createPayload = $dto->toArray();
+    $updatePayload = $dto->toUpdateArray();
+
+    expect($createPayload)->toHaveKey('primary_email')
+        ->and($updatePayload)->not->toHaveKey('primary_email')
+        ->and($updatePayload)->toHaveKey('name')
+        ->and($updatePayload)->toHaveKey('company_name');
 });
 
 

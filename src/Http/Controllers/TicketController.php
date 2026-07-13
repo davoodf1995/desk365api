@@ -10,7 +10,8 @@ use Davoodf1995\Desk365\DTO\{
     TicketFilterDto,
     TicketResponseDto,
     ReplyDto,
-    NoteDto
+    NoteDto,
+    ConversationImportDto,
 };
 use Davoodf1995\Desk365\Traits\LogsApiCalls;
 use Davoodf1995\Desk365\Traits\HandlesApiResponses;
@@ -99,18 +100,14 @@ class TicketController
             } else {
                 $ticketArray = $ticketData->toArray();
                 unset($ticketArray['file']);
-                $ticketObject = json_encode($ticketArray);
-                $endpoint = $this->getEndpoint('tickets/create_with_attachment', ['ticket_object' => $ticketObject]);
+                $ticketObject = json_encode($ticketArray, JSON_UNESCAPED_UNICODE);
+                $endpoint = $this->getEndpoint('tickets/create_with_attachment');
 
-                // Uses makeLoggedApiCallWithFile which handles:
-                // - Content-Type: multipart/form-data (automatic)
-                // - Multiple files: 'files' parameter
-                // - Single file: 'file' parameter
                 $response = $this->makeLoggedApiCallWithFile(
                     method: 'POST',
                     endpoint: $endpoint,
                     headers: $this->config->getAuthHeaders(),
-                    data: [], // Parameters are in query string, not form data
+                    data: ['ticket_object' => $ticketObject],
                     file: $files,
                     timeout: $this->config->timeout,
                     operation: 'createTicket'
@@ -194,21 +191,17 @@ class TicketController
 
                 return $this->handleResponse($response);
             } else {
-                $replyObject = json_encode($replyData->toArray());
-                $endpoint = $this->getEndpoint("tickets/add_reply_with_attachment", [
-                    'ticket_number' => $ticketNumber,
-                    'reply_object' => $replyObject
-                ]);
+                $replyObject = json_encode($replyData->toArray(), JSON_UNESCAPED_UNICODE);
+                $endpoint = $this->getEndpoint('tickets/add_reply_with_attachment');
 
-                // Uses makeLoggedApiCallWithFile which handles:
-                // - Content-Type: multipart/form-data (automatic)
-                // - Multiple files: 'files' parameter
-                // - Single file: 'file' parameter
                 $response = $this->makeLoggedApiCallWithFile(
                     method: 'POST',
                     endpoint: $endpoint,
                     headers: $this->config->getAuthHeaders(),
-                    data: [], // Parameters are in query string, not form data
+                    data: [
+                        'ticket_number' => $ticketNumber,
+                        'reply_object' => $replyObject,
+                    ],
                     file: $files,
                     timeout: $this->config->timeout,
                     operation: 'addReply'
@@ -251,21 +244,17 @@ class TicketController
 
                 return $this->handleResponse($response);
             } else {
-                $noteObject = json_encode($noteData->toArray());
-                $endpoint = $this->getEndpoint("tickets/add_note_with_attachment", [
-                    'ticket_number' => $ticketNumber,
-                    'note_object' => $noteObject
-                ]);
+                $noteObject = json_encode($noteData->toArray(), JSON_UNESCAPED_UNICODE);
+                $endpoint = $this->getEndpoint('tickets/add_note_with_attachment');
 
-                // Uses makeLoggedApiCallWithFile which handles:
-                // - Content-Type: multipart/form-data (automatic)
-                // - Multiple files: 'files' parameter
-                // - Single file: 'file' parameter
                 $response = $this->makeLoggedApiCallWithFile(
                     method: 'POST',
                     endpoint: $endpoint,
                     headers: $this->config->getAuthHeaders(),
-                    data: [], // Parameters are in query string, not form data
+                    data: [
+                        'ticket_number' => $ticketNumber,
+                        'note_object' => $noteObject,
+                    ],
                     file: $files,
                     timeout: $this->config->timeout,
                     operation: 'addNote'
@@ -276,6 +265,30 @@ class TicketController
         } catch (\Exception $e) {
             Log::error('Desk365 API Error - Add Note', ['ticket_number' => $ticketNumber, 'error' => $e->getMessage()]);
             return ApiResponseDto::error('Failed to add note: ' . $e->getMessage());
+        }
+    }
+
+    public function importConversations(string $ticketNumber, ConversationImportDto $data): ApiResponseDto
+    {
+        try {
+            $endpoint = $this->getEndpoint('tickets/import_conversations', ['ticket_number' => $ticketNumber]);
+            $response = $this->makeLoggedApiCall(
+                method: 'POST',
+                endpoint: $endpoint,
+                headers: $this->config->getAuthHeaders(),
+                data: $data->toArray(),
+                timeout: $this->config->timeout,
+                operation: 'importConversations'
+            );
+
+            return $this->handleResponse($response);
+        } catch (\Exception $e) {
+            Log::error('Desk365 API Error - Import Conversations', [
+                'ticket_number' => $ticketNumber,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ApiResponseDto::error('Failed to import conversations: '.$e->getMessage());
         }
     }
 

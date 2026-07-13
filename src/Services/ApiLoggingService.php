@@ -3,6 +3,7 @@
 namespace Davoodf1995\Desk365\Services;
 
 use Davoodf1995\Desk365\Models\Desk365ApiLog;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class ApiLoggingService
@@ -22,16 +23,25 @@ class ApiLoggingService
         ?string $errorMessage
     ): void {
         try {
-            // Check if the model table exists before trying to log
-            if (!$this->tableExists()) {
+            if (! $this->tableExists()) {
                 Log::debug('Desk365 API Log table does not exist, skipping database log', [
                     'endpoint' => $endpoint,
                     'method' => $method,
                 ]);
+
                 return;
             }
 
-            Desk365ApiLog::create([
+            $modelClass = config('desk365.api_log_model', Desk365ApiLog::class);
+            if (! is_string($modelClass) || ! is_a($modelClass, Model::class, true)) {
+                Log::warning('Desk365 api_log_model config invalid; using package default model.', [
+                    'configured' => $modelClass,
+                ]);
+                $modelClass = Desk365ApiLog::class;
+            }
+
+            /** @var class-string<Model> $modelClass */
+            $modelClass::query()->create([
                 'method' => $method,
                 'endpoint' => $endpoint,
                 'request_headers' => $requestHeaders,
@@ -43,7 +53,6 @@ class ApiLoggingService
                 'error_message' => $errorMessage,
             ]);
         } catch (\Exception $e) {
-            // Log to Laravel log if database logging fails
             Log::error('Failed to log Desk365 API call to database', [
                 'error' => $e->getMessage(),
                 'endpoint' => $endpoint,

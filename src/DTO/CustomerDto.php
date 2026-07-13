@@ -19,6 +19,11 @@ class CustomerDto
     ) {
     }
 
+    /**
+     * CreateContactRequestModel payload (POST /contacts/create).
+     *
+     * @return array<string, string>
+     */
     public function toArray(): array
     {
         return array_filter([
@@ -29,7 +34,24 @@ class CustomerDto
             'mobile' => $this->mobile,
             'phone' => $this->phone,
             'company_name' => $this->company_name,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => $value !== null);
+    }
+
+    /**
+     * UpdateContactRequestModel payload (PUT /contacts/update).
+     * primary_email is passed as a query parameter, not in the body.
+     *
+     * @return array<string, string>
+     */
+    public function toUpdateArray(): array
+    {
+        return array_filter([
+            'name' => $this->name,
+            'title' => $this->title,
+            'mobile' => $this->mobile,
+            'phone' => $this->phone,
+            'company_name' => $this->company_name,
+        ], fn ($value) => $value !== null);
     }
 
     public static function fromArray(array $data): self

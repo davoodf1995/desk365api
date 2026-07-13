@@ -21,7 +21,8 @@ use Davoodf1995\Desk365\DTO\{
     NoteDto,
     AgentDto,
     CustomerDto,
-    CompanyDto
+    CompanyDto,
+    ConversationImportDto,
 };
 
 class Desk365
@@ -106,6 +107,13 @@ class Desk365
     {
         self::getConfig();
         return self::$ticketController->addNote($ticketNumber, $noteData, $files);
+    }
+
+    public static function importConversations(string $ticketNumber, ConversationImportDto $data)
+    {
+        self::getConfig();
+
+        return self::$ticketController->importConversations($ticketNumber, $data);
     }
 
     public static function closeTicket(string $ticketNumber)
